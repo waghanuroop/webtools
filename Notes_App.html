@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Notes App</title>
+  
+</head>
+<body class="bg-gray-100 p-8">
+  <div class="max-w-2xl mx-auto">
+    <h1 class="text-3xl font-bold text-center mb-8">Notes App</h1>
+
+    <!-- Input Area -->
+    <div class="bg-white p-6 rounded-lg shadow-md mb-6">
+      <textarea id="noteInput" placeholder="Enter your note here..." class="w-full p-2 border rounded-lg mb-4"></textarea>
+      <button id="addNoteBtn" class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600">Add Note</button>
+    </div>
+
+    <!-- Notes List -->
+    <div id="notesList" class="space-y-4"></div>
+  </div>
+
+  <script src="script.js"></script>
+  <script>
+    // DOM Elements
+const noteInput = document.getElementById('noteInput');
+const addNoteBtn = document.getElementById('addNoteBtn');
+const notesList = document.getElementById('notesList');
+
+// Load notes from LocalStorage on page load
+document.addEventListener('DOMContentLoaded', loadNotes);
+
+// Add Note
+addNoteBtn.addEventListener('click', () => {
+  const noteText = noteInput.value.trim();
+  if (noteText !== '') {
+    addNoteToDOM(noteText);
+    saveNoteToLocalStorage(noteText);
+    noteInput.value = ''; // Clear input
+  }
+});
+
+// Add Note to DOM
+function addNoteToDOM(noteText) {
+  const noteElement = document.createElement('div');
+  noteElement.className = 'bg-white p-4 rounded-lg shadow-md';
+  noteElement.innerHTML = `
+    <p class="text-gray-700">${noteText}</p>
+    <button class="mt-2 text-red-500 hover:text-red-700">Delete</button>
+  `;
+  notesList.appendChild(noteElement);
+
+  // Add delete functionality
+  const deleteBtn = noteElement.querySelector('button');
+  deleteBtn.addEventListener('click', () => {
+    notesList.removeChild(noteElement);
+    removeNoteFromLocalStorage(noteText);
+  });
+}
+
+// Save Note to LocalStorage
+function saveNoteToLocalStorage(noteText) {
+  let notes = JSON.parse(localStorage.getItem('notes')) || [];
+  notes.push(noteText);
+  localStorage.setItem('notes', JSON.stringify(notes));
+}
+
+// Load Notes from LocalStorage
+function loadNotes() {
+  let notes = JSON.parse(localStorage.getItem('notes')) || [];
+  notes.forEach(note => addNoteToDOM(note));
+}
+
+// Remove Note from LocalStorage
+function removeNoteFromLocalStorage(noteText) {
+  let notes = JSON.parse(localStorage.getItem('notes')) || [];
+  notes = notes.filter(note => note !== noteText);
+  localStorage.setItem('notes', JSON.stringify(notes));
+}
+  </script>
+</body>
+</html>
